@@ -2,11 +2,14 @@
   "name": "density-sim",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "linear-gradient": "^1.0.6",
     "probability-distributions": "^0.9.1",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-odometer": "0.0.1",
+    "react-odometerjs": "^2.1.0",
     "react-scripts": "1.1.4"
   },
   "scripts": {
