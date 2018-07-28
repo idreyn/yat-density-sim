@@ -1,4 +1,3 @@
-// @flow
 import React, { Component } from 'react'
 import Gradient from 'linear-gradient'
 
@@ -568,7 +567,7 @@ class SimulationView extends Component {
 
 class App extends Component {
   static defaultProps = {
-    width: 1000,
+    width: window.innerWidth,
     height: 500,
   }
 
