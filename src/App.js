@@ -301,7 +301,7 @@ class SimulationView extends Component {
     };
 
     handleSelectRadiusStart = () => this.setState({selectingRadius: true});
-    handleselectRadiusEnd = () => this.setState({selectingRadius: false});
+    handleSelectRadiusEnd = () => this.setState({selectingRadius: false});
 
     logState = () => {
         console.log(JSON.stringify(this.state));
@@ -370,7 +370,7 @@ class SimulationView extends Component {
                 strokeWidth={3}
                 style={{cursor: "pointer"}}
                 onMouseDown={this.handleSelectRadiusStart}
-                onMouseUp={this.handleselectRadiusEnd}
+                onMouseUp={this.handleSelectRadiusEnd}
             />;
         }
         return <g key="selector" style={{filter: "url(#shadow)"}}>
