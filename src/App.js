@@ -4,24 +4,35 @@ import Gradient from "linear-gradient";
 
 import background from "./background.svg";
 import "./App.css";
+import savedState from "./saved-state";
 
-const homePath = `M87.8,33.8L47.7,1.6c-2.1-2.1-5.4-2.1-7.5,0l-40,32.2c-2.1,2.1,10.1,3.9,10.1,3.9v30.8c0,2.2,0.1,4,0.1,4h25.5V50.8h16.4
-v21.8h25.5c0,0,0.1-1.8,0.1-4V37.7C77.8,37.7,89.9,35.9,87.8,33.8z`;
+const homePath = {
+    bounds: {x: 78.3, y: 76.2},
+    path: `M77.8,40.6l-4.2,4.2c-0.8,0.8-2,0.8-2.8,0L39.2,13.2L7.6,44.8c-0.8,0.8-2,0.8-2.8,0l-4.2-4.2c-0.8-0.8-0.8-2,0-2.8L37.8,0.6
+	c0.8-0.8,2-0.8,2.8,0l37.2,37.2C78.5,38.5,78.5,39.8,77.8,40.6z M39.2,17.2l28,28v29c0,1.1-0.9,2-2,2h-26c-1.1,0-2-0.9-2-2v-21
+	c0-0.6-0.4-1-1-1h-14c-0.6,0-1,0.4-1,1v21c0,1.1-0.9,2-2,2h-6c-1.1,0-2-0.9-2-2v-29L39.2,17.2z M45.2,63.2c0,0.6,0.4,1,1,1h10
+	c0.6,0,1-0.4,1-1v-10c0-0.6-0.4-1-1-1h-10c-0.6,0-1,0.4-1,1V63.2z`,
+};
+
+const apartmentPath = {
+    bounds: {x: 42, y: 80},
+    path: `M40,0H2C0.9,0,0,0.9,0,2v76c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2v-8c0-0.6,0.4-1,1-1h8c0.6,0,1,0.4,1,1v8c0,1.1,0.9,2,2,2h12
+	c1.1,0,2-0.9,2-2V2C42,0.9,41.1,0,40,0z M14,60c0,0.6-0.4,1-1,1H7c-0.6,0-1-0.4-1-1V39c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V60z
+	 M14,32c0,0.6-0.4,1-1,1H7c-0.6,0-1-0.4-1-1V11c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V32z M25,60c0,0.6-0.4,1-1,1h-6c-0.6,0-1-0.4-1-1
+	V39c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V60z M25,32c0,0.6-0.4,1-1,1h-6c-0.6,0-1-0.4-1-1V11c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V32z
+	 M36,60c0,0.6-0.4,1-1,1h-6c-0.6,0-1-0.4-1-1V39c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V60z M36,32c0,0.6-0.4,1-1,1h-6c-0.6,0-1-0.4-1-1
+	V11c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V32z`,
+};
 
 const MAX_POSSIBLE_PRICE = 3000;
 const MIN_POSSIBLE_PRICE = 500;
 const SIMULATION_SPACE_SCALE = 100;
 
-const TOD_HOME_COUNT = 8;
+const TOD_HOME_COUNT = 6;
 const STATION_CATCHMENT_AREA = 15;
 const SIMULATION_PRICE_ORIGIN = {x: 23.4, y: -6.4};
-const MIN_SELECTION_RADIUS = 5;
-const MAX_SELECTION_RADIUS = 150;
-
-const pr = arg => {
-    console.log(arg);
-    return arg;
-};
+const MIN_SELECTION_RADIUS = 20;
+const MAX_SELECTION_RADIUS = 175;
 
 const roundTo = (x, n) => Math.round(x * Math.pow(10, n)) / Math.pow(10, n);
 
@@ -61,20 +72,27 @@ const priceAtLocation = (location, stations) => {
     );
 };
 
-const normalizePrice = price =>
-    (price - MIN_POSSIBLE_PRICE) / (MAX_POSSIBLE_PRICE - MIN_POSSIBLE_PRICE);
+const normalizePrice = (price, max = MAX_POSSIBLE_PRICE, min = MIN_POSSIBLE_PRICE) =>
+    (price - min) / (max - min);
 
 const formatPrice = price => {
     const negative = price < 0;
-    const rounded = roundTo(Math.abs(price), 2);
-    return (negative ? "-" : "") + "$" + rounded.toString();
+    price = Math.abs(price);
+    const dollars = Math.round(price);
+    const cents = (s => {
+        if(s.length === 1) s = "0" + s;
+        if(s.length > 2) s = s.slice(0, 2);
+        return s;
+    })((roundTo(price - Math.floor(price), 2) * 100).toString())
+    const rounded = `${dollars}.${cents}`;
+    return (negative ? "-" : "") + "$" + rounded;
 };
 
 const buildTOD = (station, count) => {
     const dTheta = Math.PI * 2 / count;
     const varyRadius = 0.0;
     const varyTheta = 0.0;
-    const baseRadius = (SIMULATION_SPACE_SCALE / 15);
+    const baseRadius = (SIMULATION_SPACE_SCALE / 12);
     const prng = psuedorandom(Math.abs(station.x * station.y));
     const homes = [];
     for (let i = 0; i < count ; i++) {
@@ -89,20 +107,22 @@ const buildTOD = (station, count) => {
 
 const priceGradient = new Gradient([[0, 0, 255], [255, 0, 0]]);
 
-const Home = ({onClick, position: {x, y}, size, index, color, selected, isTOD}) =>
-    <svg
+const Home = ({onClick, position: {x, y}, size, index, color, selected, isTOD}) => {
+    const {path, bounds: {x: viewboxWidth, y: viewboxHeight}} = isTOD ? apartmentPath : homePath;
+    return <svg
         key={index}
-        viewBox="0 0 88.1 72.6"
+        viewBox={`0 0 ${viewboxWidth} ${viewboxHeight}`}
         style={{cursor: "pointer", opacity: selected ? 1 : 0.5}}
         x={x - size / 2}
-        y={y - size / 2}
+        y={y - size}
         width={size}
-        height={size}
+        height={size * (viewboxHeight / viewboxWidth)}
         onClick={onClick}
         preserveAspectRatio="none"
     >
-        <path d={homePath} fill={color} />
+        <path d={path} fill={color} />
     </svg>;
+};
 
 const Station = ({onClick, position: {x, y}, size, index, selected, visible}) =>
     <circle
@@ -115,11 +135,44 @@ const Station = ({onClick, position: {x, y}, size, index, selected, visible}) =>
         key={index}
     />;
 
+const CounterWithArrow = ({price, label}) => {
+    if (isNaN(price)) {
+        return null;
+    }
+    const color = priceGradient.calcHex(normalizePrice(price, 300, -150));
+    const rotateDeg = price < 0 ? 180 : 0;
+    return <div style={{background: "white", padding: 4}}>
+        <div>
+            <i>{label}</i>
+        </div>
+        <div style={{display: "flex"}}>
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: 10,
+                    transition: "0.2s transform ease-out",
+                    transform: `rotate(${rotateDeg}deg)`
+                }}
+            >
+                <svg width={20} height={10} viewBox="0 0 20 10">
+                    <polygon points="0,10 20,10 10,0" fill={color} />
+                </svg>
+            </div>
+            <div style={{fontSize: "1.5em", color}}>
+                {formatPrice(price)}
+            </div>
+        </div>
+    </div>;
+}
+
+const isLocked = window.location.search.includes("locked");
+
 class SimulationView extends Component {
     static defaultProps = {
         homeSize: 20,
         stationSize: 30,
-        editMode: true,
+        editMode: !isLocked,
     };
 
     lsInitialState = (...keys) => {
@@ -135,10 +188,10 @@ class SimulationView extends Component {
         () => localStorage.setItem(key, JSON.stringify(value)),
     );
 
-    state = {
+    state = isLocked ? savedState : {
         ...this.lsInitialState("homes", "stations"),
         selectingRadius: false,
-        selectionRadius: 10,
+        selectionRadius: MIN_SELECTION_RADIUS,
         mode: "homes",
     };
 
@@ -250,11 +303,15 @@ class SimulationView extends Component {
     handleSelectRadiusStart = () => this.setState({selectingRadius: true});
     handleselectRadiusEnd = () => this.setState({selectingRadius: false});
 
+    logState = () => {
+        console.log(JSON.stringify(this.state));
+    }
+
     renderControls() {
         const {editMode} = this.props;
         return editMode && <div style={{position: "absolute", bottom: 10, left: 10, zIndex: 1}}>
             <button onClick={() => this.setHomes([])}>clear</button>
-            <button onClick={() => console.log(JSON.stringify(this.state.homes))}>log</button>
+            <button onClick={this.logState}>log</button>
             <select onChange={e => this.setState({mode: e.target.value})} value={this.state.mode}>
                 <option value="homes">adding homes</option>
                 <option value="stations">adding stations</option>
@@ -281,6 +338,7 @@ class SimulationView extends Component {
     renderBackground() {
         const {width, height} = this.props;
         return <img
+            alt=""
             src={background}
             width={width}
             height={height}
@@ -322,7 +380,7 @@ class SimulationView extends Component {
                 r={viewRadius}
                 stroke={"black"}
                 strokeWidth={3}
-                fill={"rgba(0, 0, 0, 0.1)"}
+                fill={"rgba(0, 0, 0, 0.05)"}
             />;
             {handle}
         </g>;
@@ -340,8 +398,19 @@ class SimulationView extends Component {
         const homesTODDelta = averagePrice(homes) - averagePrice(homesWithoutTOD);
         const selectedHomesTODDelta = averagePrice(selectedHomes) - averagePrice(selectedHomesWithoutTOD);
 
-        return <div style={{position: "absolute", userSelect: "none", right: 10, top: 10}}>
-            {formatPrice(homesTODDelta)} | {formatPrice(selectedHomesTODDelta)}
+        return <div style={{position: "absolute", userSelect: "none", right: 10, bottom: 10, background: "white", padding: 4, borderRadius: 4}}>
+            Effect of
+            {" "}
+            <Home size={20} position={{x: 0, y: 0}} color={"black"} selected={true} isTOD={true} />
+            {" "}
+            on price of
+            {" "}
+            <Home size={20} position={{x: 0, y: 0}} color={"black"} selected={true} />
+            {": "}
+            <div>
+                <CounterWithArrow price={selectedHomesTODDelta} label="In the selected radius" />
+                <CounterWithArrow price={homesTODDelta} label="Across the region" />
+            </div>
         </div>
     }
 
@@ -360,7 +429,6 @@ class SimulationView extends Component {
             width={width}
             height={height}
             onClick={editMode ? this.handleClick : null}
-            onMouseUp={this.handleSelectRadiusEnd}
             style={{position: "absolute"}}
         >
             <defs>
@@ -373,27 +441,7 @@ class SimulationView extends Component {
                     />
                 </filter>
             </defs>
-            <g>
-            {homes.map((home, i) => {
-                const {x, y} = this.mapToViewCoordinates(home)
-                return <Home
-                    position={{x, y}}
-                    isTOD={home.isTOD}
-                    size={homeSize}
-                    index={i}
-                    key={i}
-                    selected={home.selected}
-                    onClick={e => {
-                        console.log("oof");
-                        e.stopPropagation();
-                        editMode && this.removeHome(home.basis);
-                    }}
-                    color={priceGradient.calcHex(normalizePrice(home.price))}
-                />;
-            })}
-            </g>
             {<g>
-                {selectedStation && this.renderRadiusSelector(selectedStation)}
                 {stations.map((station, i) => {
                     const {x, y} = this.mapToViewCoordinates(station);
                     return <Station
@@ -416,6 +464,25 @@ class SimulationView extends Component {
                     />;
                 })}
             </g>}
+            <g>
+            {homes.map((home, i) => {
+                const {x, y} = this.mapToViewCoordinates(home)
+                return <Home
+                    position={{x, y}}
+                    isTOD={home.isTOD}
+                    size={homeSize}
+                    index={i}
+                    key={i}
+                    selected={home.selected}
+                    onClick={e => {
+                        e.stopPropagation();
+                        editMode && this.removeHome(home.basis);
+                    }}
+                    color={priceGradient.calcHex(normalizePrice(home.price))}
+                />;
+            })}
+            {selectedStation && (!editMode || mode !== "homes") && this.renderRadiusSelector(selectedStation)}
+            </g>
         </svg>;
     }
 
@@ -424,12 +491,13 @@ class SimulationView extends Component {
         return <div
             style={{background: "#EEE", position: "relative", width, height}}
             onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleSelectRadiusEnd}
         >
             {this.renderControls()}
             {this.renderMousePosition()}
             {this.renderBackground()}
-            {this.renderPrices()}
             {this.renderHomes()}
+            {this.renderPrices()}
         </div>;
     }
 }
