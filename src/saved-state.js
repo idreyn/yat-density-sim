@@ -142,4 +142,4 @@ export default {
   selectionRadius: 20,
   mode: 'homes',
   mousePosition: { x: -99.4, y: -48 },
-};
+}

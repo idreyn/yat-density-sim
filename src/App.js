@@ -161,7 +161,7 @@ const CounterWithArrow = ({ price, label }) => {
   const color = priceGradient.calcHex(normalizePrice(price, 300, -150))
   const rotateDeg = price < 0 ? 180 : 0
   return (
-    <div style={{ background: 'white', padding: 4 }}>
+    <div style={{ padding: 4 }}>
       <div>
         <i>{label}</i>
       </div>
@@ -440,32 +440,39 @@ class SimulationView extends Component {
     return (
       <div
         style={{
+          display: 'flex',
+          pointerEvents: 'none',
           position: 'absolute',
           userSelect: 'none',
-          right: 10,
-          bottom: 10,
-          background: 'white',
+          background: 'rgba(255, 255, 255, 0.9)',
           padding: 4,
           borderRadius: 4,
+          bottom: 4,
+          border: '2px solid #EEE',
+          left: '50%',
+          height: 50,
+          transform: 'translate(-50%, 0)',
         }}
       >
-        Effect of{' '}
-        <Home
-          size={20}
-          position={{ x: 0, y: 0 }}
-          color={'black'}
-          selected={true}
-          isTOD={true}
-        />{' '}
-        on price of{' '}
-        <Home
-          size={20}
-          position={{ x: 0, y: 0 }}
-          color={'black'}
-          selected={true}
-        />
-        {': '}
-        <div>
+        <div style={{ marginRight: 20 }}>
+          Effect of{' '}
+          <Home
+            size={20}
+            position={{ x: 0, y: 0 }}
+            color={'black'}
+            selected={true}
+            isTOD={true}
+          />{' '}
+          on price of{' '}
+          <Home
+            size={20}
+            position={{ x: 0, y: 0 }}
+            color={'black'}
+            selected={true}
+          />
+          {': '}
+        </div>
+        <div style={{ display: 'flex' }}>
           <CounterWithArrow
             price={selectedHomesTODDelta}
             label="In the selected radius"
