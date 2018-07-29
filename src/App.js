@@ -23,6 +23,8 @@ const apartmentPath = {
 	V11c0-0.6,0.4-1,1-1h6c0.6,0,1,0.4,1,1V32z`,
 }
 
+const priceGradient = new Gradient([[0, 0, 255], [255, 0, 0]])
+
 const MAX_POSSIBLE_PRICE = 3000
 const MIN_POSSIBLE_PRICE = 500
 const SIMULATION_SPACE_SCALE = 100
@@ -103,7 +105,17 @@ const buildTOD = (station, count) => {
   return homes
 }
 
-const priceGradient = new Gradient([[0, 0, 255], [255, 0, 0]])
+const spectrumText = (s, gradient = priceGradient) => (
+  <span>
+    {s
+      .split('')
+      .map((letter, index, { length }) => (
+        <span style={{ color: priceGradient.calcHex(index / length) }}>
+          {letter}
+        </span>
+      ))}
+  </span>
+)
 
 const Home = ({
   onClick,
@@ -438,7 +450,7 @@ class SimulationView extends Component {
     return (
       <div
         style={{
-          width: 625,
+          width: 700,
           display: 'flex',
           pointerEvents: 'none',
           position: 'absolute',
@@ -462,7 +474,9 @@ class SimulationView extends Component {
             selected={true}
             isTOD={true}
           />{' '}
-          on average price of{' '}
+          on average
+          <b> {spectrumText('monthly rent')} </b>
+          of{' '}
           <Home
             size={20}
             position={{ x: 0, y: 0 }}
