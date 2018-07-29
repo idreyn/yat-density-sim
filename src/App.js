@@ -438,7 +438,7 @@ class SimulationView extends Component {
     return (
       <div
         style={{
-          width: 510,
+          width: 625,
           display: 'flex',
           pointerEvents: 'none',
           position: 'absolute',
@@ -454,7 +454,7 @@ class SimulationView extends Component {
         }}
       >
         <div style={{ marginRight: 20 }}>
-          Effect of{' '}
+          Effect of adding{' '}
           <Home
             size={20}
             position={{ x: 0, y: 0 }}
@@ -462,7 +462,7 @@ class SimulationView extends Component {
             selected={true}
             isTOD={true}
           />{' '}
-          on price of{' '}
+          on average price of{' '}
           <Home
             size={20}
             position={{ x: 0, y: 0 }}
