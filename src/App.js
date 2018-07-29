@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Gradient from 'linear-gradient'
+import currencyFormatter from 'currency-formatter'
 
 import background from './background.svg'
 import './App.css'
@@ -74,19 +75,6 @@ const normalizePrice = (
   max = MAX_POSSIBLE_PRICE,
   min = MIN_POSSIBLE_PRICE
 ) => (price - min) / (max - min)
-
-const formatPrice = price => {
-  const negative = price < 0
-  price = Math.abs(price)
-  const dollars = Math.round(price)
-  const cents = (s => {
-    if (s.length === 1) s = '0' + s
-    if (s.length > 2) s = s.slice(0, 2)
-    return s
-  })((roundTo(price - Math.floor(price), 2) * 100).toString())
-  const rounded = `${dollars}.${cents}`
-  return (negative ? '-' : '') + '$' + rounded
-}
 
 const buildTOD = (station, count) => {
   const dTheta = (Math.PI * 2) / count
@@ -192,7 +180,9 @@ const CounterWithArrow = ({ price, label }) => {
             <polygon points="0,10 20,10 10,0" fill={color} />
           </svg>
         </div>
-        <div style={{ fontSize: '1.5em', color }}>{formatPrice(price)}</div>
+        <div style={{ fontSize: '1.5em', color }}>
+          {currencyFormatter.format(price, { code: 'USD' })}
+        </div>
       </div>
     </div>
   )
