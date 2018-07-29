@@ -122,11 +122,12 @@ const Home = ({
     <svg
       key={index}
       viewBox={`0 0 ${viewboxWidth} ${viewboxHeight}`}
-      style={{ cursor: 'pointer', opacity: selected ? 1 : 0.5 }}
+      style={{ opacity: selected ? 1 : 0.5 }}
       x={x - size / 2}
       y={y - size}
       width={size}
       height={size * (viewboxHeight / viewboxWidth)}
+      onMouseOver={e => e.stopPropagation()}
       onClick={onClick}
       preserveAspectRatio="none"
     >
@@ -300,22 +301,19 @@ class SimulationView extends Component {
     })
   }
 
-  handleMouseMove = ({ nativeEvent: { offsetX, offsetY } }) => {
+  handleMouseMove = ({ target, nativeEvent: { x, y } }) => {
     const { selectingRadius } = this.state
     const selectedStation = this.getSelectedStation()
-    const mousePosition = this.mapFromViewCoordinates({
-      x: offsetX,
-      y: offsetY,
-    })
+    const mousePosition = this.mapFromViewCoordinates({ x, y })
     this.setState({ mousePosition })
     if (selectingRadius && selectedStation) {
       this.setSelectedRadius(selectedStation, mousePosition)
     }
   }
 
-  handleClick = ({ nativeEvent: { offsetX, offsetY } }) => {
+  handleClick = ({ nativeEvent: { x, y } }) => {
     const { mode } = this.state
-    const item = this.mapFromViewCoordinates({ x: offsetX, y: offsetY })
+    const item = this.mapFromViewCoordinates({ x, y })
     if (mode === 'homes') {
       this.addHome(item)
     } else if (mode === 'stations') {
@@ -455,7 +453,7 @@ class SimulationView extends Component {
           transform: 'translate(-50%, 0)',
         }}
       >
-        <div style={{ marginRight: 20, flexGrow: 1 }}>
+        <div style={{ marginRight: 20 }}>
           Effect of{' '}
           <Home
             size={20}
@@ -563,11 +561,13 @@ class SimulationView extends Component {
         onMouseMove={this.handleMouseMove}
         onMouseUp={this.handleSelectRadiusEnd}
       >
-        {this.renderControls()}
-        {this.renderMousePosition()}
-        {this.renderBackground()}
-        {this.renderHomes()}
-        {this.renderPrices()}
+        <div>
+          {this.renderControls()}
+          {this.renderMousePosition()}
+          {this.renderBackground()}
+          {this.renderHomes()}
+          {this.renderPrices()}
+        </div>
       </div>
     )
   }
