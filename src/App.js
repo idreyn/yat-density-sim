@@ -440,6 +440,7 @@ class SimulationView extends Component {
     return (
       <div
         style={{
+          width: 510,
           display: 'flex',
           pointerEvents: 'none',
           position: 'absolute',
@@ -454,7 +455,7 @@ class SimulationView extends Component {
           transform: 'translate(-50%, 0)',
         }}
       >
-        <div style={{ marginRight: 20 }}>
+        <div style={{ marginRight: 20, flexGrow: 1 }}>
           Effect of{' '}
           <Home
             size={20}
@@ -574,7 +575,7 @@ class SimulationView extends Component {
 
 class App extends Component {
   static defaultProps = {
-    width: window.innerWidth,
+    width: Math.max(1000, window.innerWidth),
     height: 500,
   }
 
